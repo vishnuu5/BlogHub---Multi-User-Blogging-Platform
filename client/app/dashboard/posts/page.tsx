@@ -1,38 +1,38 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { trpc } from "@/lib/trpc"
-import { Plus, Filter, Eye, Edit3, Trash2 } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { trpc } from "@/lib/trpc";
+import { Plus, Filter, Eye, Edit3, Trash2 } from "lucide-react";
 
 export default function PostsPage() {
-  const [filter, setFilter] = useState<"all" | boolean>("all")
+  const [filter, setFilter] = useState<"all" | boolean>("all");
 
   const { data: postsData, isLoading } = trpc.posts.getAll.useQuery({
     ...(filter !== "all" && { published: filter === true }),
     limit: 50,
     offset: 0,
-  })
+  });
 
-  const utils = trpc.useUtils()
+  const utils = trpc.useUtils();
   const deletePost = trpc.posts.delete.useMutation({
     onSuccess: () => {
-      utils.posts.getAll.invalidate()
+      utils.posts.getAll.invalidate();
     },
     onError: (error) => {
-      console.error("Error deleting post:", error)
+      console.error("Error deleting post:", error);
     },
-  })
+  });
 
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this post?")) {
       try {
-        await deletePost.mutateAsync({ id })
+        await deletePost.mutateAsync({ id });
       } catch (error) {
-        console.error("Error deleting post:", error)
+        console.error("Error deleting post:", error);
       }
     }
-  }
+  };
 
   return (
     <div className="container py-12">
@@ -78,15 +78,26 @@ export default function PostsPage() {
           <table className="w-full">
             <thead className="bg-gray-100 border-b-2 border-gray-400">
               <tr>
-                <th className="text-left p-4 text-black font-semibold">Title</th>
-                <th className="text-left p-4 text-black font-semibold">Status</th>
-                <th className="text-left p-4 text-black font-semibold">Created</th>
-                <th className="text-left p-4 text-black font-semibold">Actions</th>
+                <th className="text-left p-4 text-black font-semibold">
+                  Title
+                </th>
+                <th className="text-left p-4 text-black font-semibold">
+                  Status
+                </th>
+                <th className="text-left p-4 text-black font-semibold">
+                  Created
+                </th>
+                <th className="text-left p-4 text-black font-semibold">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {postsData.posts.map((post: any) => (
-                <tr key={post.id} className="border-b border-gray-200 hover:bg-gray-50">
+                <tr
+                  key={post.id}
+                  className="border-b border-gray-200 hover:bg-gray-50"
+                >
                   <td className="p-4 font-semibold text-black">{post.title}</td>
                   <td className="p-4">
                     <span
@@ -99,7 +110,9 @@ export default function PostsPage() {
                       {post.published ? "Published" : "Draft"}
                     </span>
                   </td>
-                  <td className="p-4 text-gray-600 text-sm">{new Date(post.createdAt).toLocaleDateString()}</td>
+                  <td className="p-4 text-gray-600 text-sm">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="p-4 flex gap-3">
                     <Link
                       href={`/dashboard/posts/${post.id}/edit`}
@@ -125,11 +138,14 @@ export default function PostsPage() {
       ) : (
         <div className="text-center py-12 text-gray-600 border-2 border-gray-300 rounded-lg">
           No posts yet.{" "}
-          <Link href="/dashboard/posts/new" className="text-blue-600 font-semibold hover:underline">
+          <Link
+            href="/dashboard/posts/new"
+            className="text-blue-600 font-semibold hover:underline"
+          >
             Create one
           </Link>
         </div>
       )}
     </div>
-  )
+  );
 }
